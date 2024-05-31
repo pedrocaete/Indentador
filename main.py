@@ -1,66 +1,42 @@
-def file_reader(path): 
-    lines= []
-    file = open(path, 'r')
-    for line in file:
-        lines.append(line)
-    file.close()
+import re
+
+def read_file(path):
+    with open(path, 'r') as file:
+        lines = file.readlines()
     return lines
-    
-def spaces_counter(lines):
-    spaces = []
-    spaces_to_add_line = [] 
+def count_indent_size(lines):
+    spaces_to_add_line = []#Talvez apenas o append já faça o py indentificar como list 
     spaces_to_add_block = 0
-    for i in lines:
-        spaces.append(0)
-        spaces_to_add_line.append(0)
     for i in range(len(lines)):
-        k = 0
-        b = 1
-        for j in range(len(lines[i])):
-            if lines[i][0] != ' ':
-                b = 0
-            if lines[i][j] == ' ' and b != 0:
-                spaces[i] += 1
-                if lines[i][j+1] != ' ':
-                    b = 0
-            elif lines[i][j] == '{':
-                spaces_to_add_block += 4
-                k = 1
-            elif lines[i][j] == '}':
-                spaces_to_add_block -= 4
-        if k == 0:
-            spaces_to_add_line[i] += spaces_to_add_block
-        else:
-            spaces_to_add_line[i] += spaces_to_add_block - 4
-        lines[i] = lines[i].replace(" ", "", spaces[i])
+        if re.search(r'\S', lines[i]):
+            lines[i] = lines[i].lstrip()
+    for i in range(len(lines)):
+        spaces_to_add_line.append(0)
+        if re.search('{',lines[i]): 
+            spaces_to_add_block += 4
+            spaces_to_add_line[i] -= 4
+        elif re.search('}',lines[i]): 
+            spaces_to_add_block -= 4
+        spaces_to_add_line[i] += spaces_to_add_block 
     return spaces_to_add_line
 
-def indenter(spaces_to_add_line, lines):
-    ix = 0
-    for i in lines:
-        spaces_to_add = spaces_to_add_line[ix]
+def indent(spaces_to_add_line, lines):
+    for i in range(len(lines)):
+        spaces_to_add = spaces_to_add_line[i]
         if spaces_to_add > 0:
-            lines[ix] = (' ' * spaces_to_add) + lines[ix]
-        ix += 1
+            lines[i] = (' ' * spaces_to_add) + lines[i]
     return lines
 
-def create_indented_file(lines):
-    file = open('indented_file.txt', 'w')
-    ix = 0
-    for i in lines: 
-        file.write(lines[ix])
-        ix += 1
-    file.close()
+def create_indented_file(lines, path):
+    with open(path, 'w') as file:
+        for i in range(len(lines)): 
+            file.write(lines[i])
 
 
 
 path = input("Caminho do arquivo a ser indentado:")
-lines = file_reader(path)
-spaces_to_add_line = spaces_counter(lines)
-lines = indenter(spaces_to_add_line, lines)
-create_indented_file(lines)
+lines = read_file(path)
+spaces_to_add_line = count_indent_size(lines)
+lines = indent(spaces_to_add_line, lines)
+create_indented_file(lines, path)
 
-
-# Versão 1
-# Lê o arquivo do código, insere 4 espaços para indentar blocos determinados por
-# {, cria um novo documento com o código indentado, mas no diretório do programa
