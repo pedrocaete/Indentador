@@ -5,19 +5,28 @@ def read_file(path):
         lines = file.readlines()
     return lines
 def count_indent_size(lines):
-    spaces_to_add_line = []#Talvez apenas o append já faça o py indentificar como list 
-    spaces_to_add_block = 0
-    for i in range(len(lines)):
-        if re.search(r'\S', lines[i]):
-            lines[i] = lines[i].lstrip()
+    k = 0
+    number_indent = 4
+    spaces_to_add_line = []
+    spaces_to_add = 0
     for i in range(len(lines)):
         spaces_to_add_line.append(0)
+        if re.search(r'\S', lines[i]):
+            lines[i] = lines[i].lstrip()
         if re.search('{',lines[i]): 
-            spaces_to_add_block += 4
-            spaces_to_add_line[i] -= 4
-        elif re.search('}',lines[i]): 
-            spaces_to_add_block -= 4
-        spaces_to_add_line[i] += spaces_to_add_block 
+            spaces_to_add += number_indent
+            spaces_to_add_line[i] -= number_indent
+        elif re.search(r'\b(if|else|for)\b', lines[i]):
+            spaces_to_add += number_indent
+            spaces_to_add_line[i] -= number_indent
+            k += 1
+        elif k != 0:
+            spaces_to_add -= number_indent * k
+            spaces_to_add_line[i] += number_indent * k
+            k = 0
+        if re.search('}',lines[i]): 
+            spaces_to_add -= number_indent
+        spaces_to_add_line[i] += spaces_to_add 
     return spaces_to_add_line
 
 def indent(spaces_to_add_line, lines):
@@ -34,7 +43,7 @@ def create_indented_file(lines, path):
 
 
 
-path = input("Caminho do arquivo a ser indentado:")
+path = input("Caminho do arquivo a ser indentado:\n")
 lines = read_file(path)
 spaces_to_add_line = count_indent_size(lines)
 lines = indent(spaces_to_add_line, lines)

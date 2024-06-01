@@ -1,2 +1,2 @@
-# Indentador
-Indenta códigos de linguagens baseadas em indentação por blocos de chave {}, como C e C++
+# Indenter
+Indents codes from programming languages with scopes oriented by curly braces {}, such as Java and C.
