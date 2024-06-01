@@ -43,7 +43,7 @@ def create_indented_file(lines, path):
 
 
 
-path = input("Caminho do arquivo a ser indentado:\n")
+path = input("Path of the file to be indented:\n")
 lines = read_file(path)
 spaces_to_add_line = count_indent_size(lines)
 lines = indent(spaces_to_add_line, lines)
